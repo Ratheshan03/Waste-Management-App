@@ -3,8 +3,10 @@ import Navbar from "./Navbar";
 import { useAuth } from "../AuthContext";
 import axios from "axios";
 import SelectLocationGoogleMap from "./SelectLocationGoogleMap";
+import { useNavigate } from "react-router-dom";
 
 const Contributor = () => {
+  const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [fullName, setFullName] = useState("");
   const [description, setDescription] = useState("");
@@ -13,6 +15,18 @@ const Contributor = () => {
   const [contactNumber, setContactNumber] = useState("");
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [showMap, setShowMap] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+
+  const resetForm = () => {
+    setFullName("");
+    setDescription("");
+    setLocation("");
+    setMedia(null);
+    setContactNumber("");
+    setSelectedLocation(null);
+    setShowMap(false);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,10 +54,13 @@ const Contributor = () => {
         throw new Error("Error submitting contribution");
       }
 
-      alert("Contribution submitted successfully");
+      setShowPopup(true);
+      setPopupMessage("Contribution submitted successfully");
     } catch (error) {
       console.error(error);
-      alert("Error submitting contribution");
+      setPopupMessage(
+        "Contribution failed, uploaded photo doesn't consist of any food wastes"
+      );
     }
   };
 
@@ -157,8 +174,43 @@ const Contributor = () => {
           </div>
         </form>
       </div>
+      {popupMessage && (
+        <Popup
+          message={popupMessage}
+          onReportAgain={() => {
+            resetForm();
+            setPopupMessage("");
+          }}
+          onCancel={() => {
+            setPopupMessage("");
+            navigate("/profile");
+          }}
+        />
+      )}
     </div>
   );
 };
 
 export default Contributor;
+
+const Popup = ({ message, onReportAgain, onCancel }) => {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="bg-white p-6 rounded shadow-md">
+        <h2 className="text-xl font-bold mb-4">{message}</h2>
+        <button
+          onClick={onReportAgain}
+          className="bg-[#609966] hover:bg-[#9DC08B] text-white font-bold py-2 px-4 rounded mr-4 focus:outline-none focus:shadow-outline"
+        >
+          Report Again
+        </button>
+        <button
+          onClick={onCancel}
+          className="bg-[#609966] hover:bg-[#9DC08B] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+};

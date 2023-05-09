@@ -72,7 +72,25 @@ router.post("/login", async (req, res) => {
     }
   );
 
-  res.json({ token, user });
+  // Convert user._id to string
+  const userWithIdAsString = user.toObject();
+  userWithIdAsString._id = user._id.toString();
+
+  res.json({ token, user: userWithIdAsString });
+});
+
+// Get user by ID route
+router.get("/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 module.exports = router;

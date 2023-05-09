@@ -23,14 +23,14 @@ const Navbar = () => {
                 to="/contributor"
                 className="hover:text-[#9DC08B] transition duration-200"
               >
-                Contributor Page
+                Contributions
               </Link>
             ) : (
               <Link
                 to="/user"
                 className="hover:text-[#9DC08B] transition duration-200"
               >
-                User Page
+                Collections
               </Link>
             )}
             <Link
@@ -46,13 +46,13 @@ const Navbar = () => {
               Contact
             </Link>
 
-            {profilePicture && (
+            {/* {profilePicture && (
               <img
                 src={`data:${profilePicture.contentType};base64,${profilePicture.data}`}
                 alt="Profile"
                 className="w-10 h-10 rounded-full object-cover"
               />
-            )}
+            )} */}
           </div>
         </div>
       </div>
