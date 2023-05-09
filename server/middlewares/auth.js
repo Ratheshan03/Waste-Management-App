@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+const User = require("../models/User.js");
 
 const isAuthenticated = async (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -8,7 +8,6 @@ const isAuthenticated = async (req, res, next) => {
     return res.status(401).json({ message: "No token provided" });
   }
 
-  // Split the header value to get the token
   const token = authHeader.split(" ")[1];
 
   try {
@@ -22,6 +21,7 @@ const isAuthenticated = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
+    console.error("Error in isAuthenticated middleware:", error);
     return res.status(401).json({ message: "Invalid token" });
   }
 };

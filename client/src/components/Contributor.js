@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Navbar from "./Navbar";
 import { useAuth } from "../AuthContext";
 import axios from "axios";
+import SelectLocationGoogleMap from "./SelectLocationGoogleMap";
 
 const Contributor = () => {
   const { currentUser } = useAuth();
@@ -10,6 +11,8 @@ const Contributor = () => {
   const [location, setLocation] = useState("");
   const [media, setMedia] = useState(null);
   const [contactNumber, setContactNumber] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [showMap, setShowMap] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,11 +20,9 @@ const Contributor = () => {
     const formData = new FormData();
     formData.append("fullName", fullName);
     formData.append("description", description);
-    formData.append("location", location);
+    formData.append("location", JSON.stringify(selectedLocation));
     formData.append("media", media);
     formData.append("contactNumber", contactNumber);
-
-    console.log("Token:", currentUser.token);
 
     try {
       const response = await axios.post(
@@ -29,8 +30,8 @@ const Contributor = () => {
         formData,
         {
           headers: {
-            Authorization: `Bearer ${currentUser.token}`,
             "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${currentUser.token}`,
           },
         }
       );
@@ -93,13 +94,21 @@ const Contributor = () => {
             >
               Location
             </label>
-            <input
-              type="text"
-              id="location"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-[#40513B] leading-tight focus:outline-none focus:shadow-outline"
-            />
+            <button
+              type="button"
+              onClick={() => setShowMap(!showMap)}
+              className="bg-[#609966] hover:bg-[#9DC08B] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+            >
+              {selectedLocation ? "Change location" : "Select location"}
+            </button>
+            {showMap && (
+              <div className="mt-4">
+                <SelectLocationGoogleMap
+                  selectedLocation={selectedLocation}
+                  setSelectedLocation={setSelectedLocation}
+                />
+              </div>
+            )}
           </div>
           <div className="mb-4">
             <label
@@ -122,6 +131,7 @@ const Contributor = () => {
               Choose File
             </button>
           </div>
+
           <div className="mb-4">
             <label
               htmlFor="contactNumber"

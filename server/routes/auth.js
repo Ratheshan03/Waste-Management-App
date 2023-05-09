@@ -68,7 +68,7 @@ router.post("/login", async (req, res) => {
     { userId: user._id, role: user.role },
     "your_jwt_secret",
     {
-      expiresIn: "1h",
+      expiresIn: "7d",
     }
   );
 

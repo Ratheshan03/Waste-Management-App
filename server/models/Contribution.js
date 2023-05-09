@@ -4,8 +4,8 @@ const ContributionSchema = new mongoose.Schema({
   fullName: { type: String, required: true },
   description: { type: String, required: true },
   location: {
-    type: { type: String, default: "Point" },
-    coordinates: { type: [Number], required: true },
+    type: String,
+    required: true,
   },
   media: {
     data: Buffer,
