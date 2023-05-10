@@ -2,6 +2,7 @@ import Navbar from "./Navbar";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
+import Footer from "./Footer";
 
 const Profile = () => {
   const { currentUser, logout } = useAuth();
@@ -10,32 +11,39 @@ const Profile = () => {
   const [userContributions, setUserContributions] = useState([]);
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const navigate = useNavigate();
+  const [userSavedContributions, setUserSavedContributions] = useState([]);
 
   useEffect(() => {
     const fetchUserContributions = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:3001/api/contributions/user-contributions",
-          {
-            headers: {
-              Authorization: `Bearer ${currentUser.token}`,
-            },
-          }
-        );
+        const endpoint =
+          role === "contributor"
+            ? `http://localhost:3001/api/contributions//user-contributions`
+            : `http://localhost:3001/api/auth/saved-contributions/${_id}`;
 
-        if (!response.ok) {
+        const response = await fetch(endpoint, {
+          headers: {
+            Authorization: `Bearer ${currentUser.token}`,
+          },
+        });
+
+        if (!response.status === 200) {
           throw new Error("Error fetching user contributions");
         }
 
         const data = await response.json();
-        setUserContributions(data);
+        if (role === "contributor") {
+          setUserContributions(data);
+        } else {
+          setUserSavedContributions(data);
+        }
       } catch (error) {
         console.error("Error:", error);
       }
     };
 
     fetchUserContributions();
-  }, [currentUser]);
+  }, [currentUser, role]);
 
   const handleLogout = async () => {
     try {
@@ -87,25 +95,22 @@ const Profile = () => {
 
         <div className="bg-white shadow-md rounded-lg px-8 pt-6 pb-8">
           <h2 className="text-2xl font-bold mb-5 text-center text-[#40513B]">
-            User Contributions
+            {role === "contributor"
+              ? "User Contributions"
+              : "Saved Contributions"}
           </h2>
-          {userContributions.map((contribution, index) => (
-            <div
-              key={index}
-              className="my-4 p-4 border border-[#9DC08B] rounded-lg"
-            >
-              <h3 className="text-xl font-semibold">
-                Reporter: {contribution.fullName}
-              </h3>
-              <p className="mt-2">Description: {contribution.description}</p>
-              <h2 className="mt-2">Contact: {contribution.contactNumber}</h2>
-              <p className="mt-2">
-                Waste Category: {contribution.detectedWaste[0].name}
-              </p>
-            </div>
+          {(role === "contributor"
+            ? userContributions
+            : userSavedContributions
+          ).map((contribution) => (
+            <ContributionCard
+              contribution={contribution}
+              key={contribution._id}
+            />
           ))}
         </div>
       </div>
+      <Footer />
       {showLogoutConfirmation && (
         <LogoutConfirmation
           message="Are you sure you want to logout?"
@@ -143,3 +148,28 @@ const LogoutConfirmation = ({ message, onLogout, onCancel }) => {
     </div>
   );
 };
+
+const ContributionCard = ({ contribution }) => (
+  <div className="my-4 p-4 border border-[#9DC08B] rounded-lg">
+    <h3 className="text-xl font-semibold">Reporter: {contribution.fullName}</h3>
+    <p className="mt-2">Description: {contribution.description}</p>
+    <h2 className="mt-2">Contact: {contribution.contactNumber}</h2>
+    <p className="mt-2 text-[#40513B]">
+      Waste Category:{" "}
+      <span className="text-[#fa658d] font-bold">
+        {contribution.detectedWaste[0].name}
+      </span>
+    </p>
+    <p className="mt-2 text-[#40513B]">
+      Reported Date: {contribution.createdTime}
+    </p>
+    <div className="mt-4">
+      <p className="text-[#40513B]">Waste Detected Image:</p>
+      <img
+        src={`data:${contribution.detectedImage.contentType};base64,${contribution.detectedImage.data}`}
+        alt="contributed-img"
+        className="mt-2 rounded-md"
+      />
+    </div>
+  </div>
+);

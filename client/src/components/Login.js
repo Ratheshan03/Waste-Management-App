@@ -6,6 +6,8 @@ import { useAuth } from "../AuthContext";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -21,17 +23,21 @@ const Login = () => {
 
       if (response.status === 200) {
         // Replace with the actual API response data
+        setPopupMessage("Login successful!");
+        setShowPopup(true);
         const role = response.data.role;
         const { token, user } = response.data;
         login({ token, user });
         // Pass the user role as a state parameter to the HomePage component
         navigate("/home", { state: { role } });
       } else {
-        alert("Login failed!");
+        setPopupMessage("Login failed!");
+        setShowPopup(true);
       }
     } catch (error) {
       console.error("Login error:", error);
-      alert("Login failed!");
+      setPopupMessage("Login failed!");
+      setShowPopup(true);
     }
   };
 
@@ -59,9 +65,35 @@ const Login = () => {
         >
           Login
         </button>
+        {showPopup && (
+          <Popup
+            message={popupMessage}
+            onCancel={() => {
+              setShowPopup(false);
+            }}
+          />
+        )}
       </div>
     </div>
   );
 };
 
 export default Login;
+
+const Popup = ({ message, onCancel }) => {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="bg-white p-6 rounded shadow-md w-72 md:w-auto">
+        <h2 className="text-xl font-bold mb-4">{message}</h2>
+        <div className="flex justify-center md:justify-end">
+          <button
+            onClick={onCancel}
+            className="bg-[#609966] hover:bg-[#9DC08B] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};

@@ -82,10 +82,73 @@ router.get("/user-contributions", isAuthenticated, async (req, res) => {
   try {
     const { user } = req;
     const contributions = await Contribution.find({ contributor: user._id });
-    res.status(200).json(contributions);
+
+    // Convert binary data to base64 strings
+    const contributionsWithBase64Images = contributions.map((contribution) => {
+      const base64Image = Buffer.from(contribution.detectedImage.data).toString(
+        "base64"
+      );
+      return {
+        ...contribution._doc, // Spread the rest of the contribution properties
+        detectedImage: {
+          ...contribution.detectedImage, // Spread the rest of the detectedImage properties
+          data: base64Image, // Replace data with base64Image
+        },
+      };
+    });
+
+    res.status(200).json(contributionsWithBase64Images);
   } catch (error) {
     console.error("Server error:", error);
     res.status(500).json({ message: "Error fetching user's contributions" });
+  }
+});
+
+router.get("/all-contributions", async (req, res) => {
+  try {
+    const contributions = await Contribution.find({});
+
+    // Convert binary data to base64 strings
+    const contributionsWithBase64Images = contributions.map((contribution) => {
+      const base64Image = Buffer.from(contribution.detectedImage.data).toString(
+        "base64"
+      );
+      return {
+        ...contribution._doc, // Spread the rest of the contribution properties
+        detectedImage: {
+          ...contribution.detectedImage, // Spread the rest of the detectedImage properties
+          data: base64Image, // Replace data with base64Image
+        },
+      };
+    });
+
+    res.status(200).json(contributionsWithBase64Images);
+  } catch (error) {
+    console.error("Server error:", error);
+    res.status(500).json({ message: "Error fetching contributions" });
+  }
+});
+
+// Update contribution status
+router.put("/update-status/:id", async (req, res) => {
+  const { status } = req.body; // Get the new status from the request body
+
+  try {
+    // Find the contribution by ID and update its status
+    const contribution = await Contribution.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true } // Return the updated document
+    );
+
+    if (!contribution) {
+      return res.status(404).json({ message: "Contribution not found" });
+    }
+
+    res.status(200).json(contribution);
+  } catch (error) {
+    console.error("Server error:", error);
+    res.status(500).json({ message: "Error updating contribution status" });
   }
 });
 

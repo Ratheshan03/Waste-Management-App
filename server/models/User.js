@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Contribution = require("../models/Contribution.js");
 
 const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
@@ -12,6 +13,9 @@ const UserSchema = new mongoose.Schema({
     data: Buffer,
     contentType: String,
   },
+  savedContributions: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "Contribution" },
+  ],
 });
 
 module.exports = mongoose.model("User", UserSchema);

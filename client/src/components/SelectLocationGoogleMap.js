@@ -17,7 +17,7 @@ const SelectLocationGoogleMap = ({ selectedLocation, setSelectedLocation }) => {
   };
 
   return (
-    <LoadScript googleMapsApiKey="AIzaSyCW4rvjYHkwy-rFg-F7jadY2XpXswA6-T0">
+    <LoadScript googleMapsApiKey="AIzaSyD4jlUuyqr03-n_JeCqMKk5kA6URN28PAg">
       <GoogleMap
         mapContainerStyle={containerStyle}
         center={defaultCenter}

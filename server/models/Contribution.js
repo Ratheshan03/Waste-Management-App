@@ -38,6 +38,9 @@ const ContributionSchema = new mongoose.Schema({
     data: Buffer,
     contentType: String,
   },
+  createdTime: { type: Date, default: Date.now },
+  status: { type: String, default: "unassigned" },
+  isSaved: { type: Boolean, default: false },
 });
 
 // Create index on the location field for faster geospatial queries
