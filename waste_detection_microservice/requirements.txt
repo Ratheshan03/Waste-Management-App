@@ -7,7 +7,7 @@ contourpy<=1.0.6
 cycler<=0.11.0
 filelock<=3.12.0
 Flask<=2.3.2
-fonttools<=4.39.3
+fonttools==4.38.0
 idna<=3.4
 importlib-metadata<=6.6.0
 importlib-resources<=5.12.0
