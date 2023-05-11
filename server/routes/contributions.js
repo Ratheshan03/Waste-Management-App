@@ -31,9 +31,12 @@ router.post(
     console.log("Received location:", location);
 
     try {
-      const response = await axios.post("http://localhost:5000/detect_waste", {
-        base64_image: base64Image, // Changed 'image' to 'base64_image'
-      });
+      const response = await axios.post(
+        "https://flask-yolov8-model.onrender.com/detect_waste",
+        {
+          base64_image: base64Image, // Changed 'image' to 'base64_image'
+        }
+      );
 
       const { waste_detected, wastes_array, output_image } = response.data;
 

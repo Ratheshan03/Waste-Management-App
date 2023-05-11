@@ -1,7 +1,7 @@
 const axios = require("axios");
 
 const flaskClient = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: "https://flask-yolov8-model.onrender.com",
   headers: { "Content-Type": "application/json" },
 });
 
