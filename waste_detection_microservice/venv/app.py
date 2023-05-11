@@ -10,6 +10,11 @@ model_path = os.path.join(os.path.dirname(__file__), "yolov8.pt")
 model = YOLO(model_path)
 
 
+@app.route('/')
+def hello_world():
+    return 'Hello, scrapsaver!'
+
+
 @app.route("/detect_waste", methods=["POST"])
 def detect_waste():
     data = request.get_json()
